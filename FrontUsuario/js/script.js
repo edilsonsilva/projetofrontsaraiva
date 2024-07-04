@@ -85,8 +85,53 @@ function carregarLivros(){
 function detalhes(){
     let id_url = window.location.search.split('=');
     const conteudo = document.querySelector(".conteudo");
+
+
     
     fetch("http://localhost:4001/api/v1/livros/detalhes/"+id_url[1])
+    .then((res)=>res.json())
+    .then((dados)=>{
+        dados.payload.map((rs)=>{
+
+            document.querySelector("h2").innerHTML = "Detalhes do livro: "+rs.nometitulo;
+            
+            let card = `<div class="card mb-3 col-md-8">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="${rs.foto1}" class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h3 class="card-title">${rs.nometitulo}</h3>
+                  <h5 class="card-title">Autor: ${rs.autor}</h5>
+                  <p class="card-text">${rs.sinopse}</p>
+                  <p class="card-text precoatual">R$ ${rs.precodesconto < 1 ? rs.precoatual : rs.precodesconto}</p>
+                  <a href=carrinho.html?idlivro=${rs.idtitulo}>
+                  <img src=img/carrinho.png width=40 height=40> Incluir no carrinho </a>
+                </div>
+              </div>
+            </div>
+          </div>`;
+
+            conteudo.innerHTML += card;
+
+        })
+    })
+    .catch((error)=>console.error(`erro na api ${error}`))
+
+}
+
+function buscar(){
+
+    const conteudo = document.querySelector(".conteudo");
+    //limpar todo o conteudo
+    conteudo.innerHTML = "";
+    //obtendo o texto escrito na caixa de busca
+    let palavra = document.querySelector("input").value;
+
+    document.querySelector("h2").innerHTML = `Você pesquisou por: ${palavra}`;  
+
+    fetch("http://localhost:4001/api/v1/livros/detalhes/titulo/"+palavra)
     .then((res)=>res.json())
     .then((dados)=>{
         dados.payload.map((rs)=>{
@@ -99,8 +144,8 @@ function detalhes(){
                 <div class="card-body">
                   <h3 class="card-title">${rs.nometitulo}</h3>
                   <h5 class="card-title">Autor: ${rs.autor}</h5>
-                  <p class="card-text">${rs.sinopse}</p>
-                  <p class="card-text precoatual">R$ ${rs.precodesconto < 1 ? rs.precoatual : rs.precodesconto}</p>
+                  <p class="card-text">R$ ${rs.precodesconto < 1 ? rs.precoatual : rs.precodesconto}</p>
+                  <a href=detalhes.html?idlivro=${rs.idtitulo}>Saiba mais</a>
                 </div>
               </div>
             </div>
@@ -111,5 +156,6 @@ function detalhes(){
         })
     })
     .catch((error)=>console.error(`erro na api ${error}`))
+
 
 }
